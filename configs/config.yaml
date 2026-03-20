@@ -1,0 +1,25 @@
+defaults:
+  - model: lstm
+  - data: sources
+  - _self_
+
+project:
+  name: OctaCryptoOracle
+  version: "1.0.0"
+
+prediction:
+  coins: [bitcoin, solana, ethereum]
+  forecast_horizon: 24
+  sequence_length: 60
+  confidence_threshold: 0.65
+
+training:
+  epochs: 50
+  batch_size: 32
+  validation_split: 0.1
+  early_stopping_patience: 10
+
+backtesting:
+  initial_capital: 10000
+  fee_pct: 0.001
+  min_confidence: 0.60
