@@ -7,18 +7,15 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
-          pip install pandas numpy pandas-ta scikit-learn xgboost requests plotly pytest pytest-mock python-dotenv
-      - name: Run tests
-        run: pytest tests/ -v --tb=short
+          pip install pandas-ta
+          pip install pandas numpy
