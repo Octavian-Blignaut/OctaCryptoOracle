@@ -42,6 +42,7 @@ class XGBoostSignalModel:
         self.learning_rate = learning_rate
         self._model: object = None
         self._feature_cols: list = _FEATURE_COLS
+        self._trained_feature_cols: list = []
 
     def prepare_features(self, df: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray]:
         """Extract feature matrix and binary target from *df*."""
@@ -66,6 +67,8 @@ class XGBoostSignalModel:
             random_state=42,
         )
         self._model.fit(X, y)
+        # Store the feature columns actually used during training
+        self._trained_feature_cols = [c for c in self._feature_cols if c in df.columns][: len(X[0])]
         if _MLFLOW_AVAILABLE:
             try:
                 mlflow.log_params({
@@ -89,9 +92,9 @@ class XGBoostSignalModel:
         return signal, confidence
 
     def get_feature_importance(self) -> dict:
-        """Return feature importance mapping."""
+        """Return feature importance mapping using columns from training."""
         if self._model is None:
             return {}
         scores = self._model.feature_importances_
-        available = self._feature_cols[: len(scores)]
-        return dict(zip(available, scores.tolist()))
+        cols = self._trained_feature_cols or self._feature_cols[: len(scores)]
+        return dict(zip(cols[: len(scores)], scores.tolist()))

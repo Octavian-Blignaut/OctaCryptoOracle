@@ -32,8 +32,9 @@ class Backtester:
 
         capital = self.initial_capital
         position = 0.0  # units held
+        entry_value = 0.0  # portfolio value at last buy
         equity_curve: List[float] = [capital]
-        trades = 0
+        completed_trades = 0
         wins = 0
 
         for i in range(1, n):
@@ -41,30 +42,35 @@ class Backtester:
             prev_signal = signals_arr[i - 1]
 
             if prev_signal == 1 and position == 0.0:
-                # Buy
-                units = capital / price
-                cost = capital * self.fee_pct
-                position = units
-                capital = -cost
-                trades += 1
+                # Buy: convert all cash to position
+                fee = capital * self.fee_pct
+                spend = capital - fee
+                position = spend / price
+                entry_value = capital
+                capital = 0.0
             elif prev_signal == 0 and position > 0.0:
-                # Sell
+                # Sell: liquidate position
                 proceeds = position * price
-                cost = proceeds * self.fee_pct
-                entry_val = equity_curve[-1]
-                capital = proceeds - cost
-                if capital > entry_val:
+                fee = proceeds * self.fee_pct
+                capital = proceeds - fee
+                if capital > entry_value:
                     wins += 1
+                completed_trades += 1
                 position = 0.0
-                trades += 1
 
             portfolio_value = capital + position * price
             equity_curve.append(portfolio_value)
 
         # Close open position at last price
         if position > 0.0:
-            final = capital + position * prices[-1]
-            equity_curve[-1] = final
+            fee = position * prices[-1] * self.fee_pct
+            final = position * prices[-1] - fee
+            if final > entry_value:
+                wins += 1
+            completed_trades += 1
+            capital = final
+            position = 0.0
+            equity_curve[-1] = capital
 
         equity_arr = np.array(equity_curve)
         total_return = (equity_arr[-1] - self.initial_capital) / self.initial_capital * 100.0
@@ -80,7 +86,7 @@ class Backtester:
         drawdown = (equity_arr - peak) / (peak + 1e-9)
         max_drawdown = float(drawdown.min() * 100.0)
 
-        win_rate = (wins / max(trades // 2, 1)) * 100.0
+        win_rate = (wins / max(completed_trades, 1)) * 100.0
 
         # Buy-and-hold
         buy_hold = (prices[-1] - prices[0]) / (prices[0] + 1e-9) * 100.0
@@ -91,7 +97,7 @@ class Backtester:
             "sharpe_ratio": sharpe,
             "max_drawdown": max_drawdown,
             "win_rate": float(win_rate),
-            "total_trades": trades,
+            "total_trades": completed_trades,
             "equity_curve": equity_arr.tolist(),
             "buy_hold_return": float(buy_hold),
         }

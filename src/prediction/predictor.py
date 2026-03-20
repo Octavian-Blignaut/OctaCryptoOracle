@@ -93,7 +93,9 @@ class CryptoPredictorService:
             ensemble_result = {"signal": 1, "signal_confidence": 0.6, "ensemble_confidence": 0.6, "direction": "BULLISH"}
 
         predicted_price_24h = float(price_forecast[-1]) if price_forecast else current_price
-        price_change_pct = (predicted_price_24h - current_price) / (current_price + 1e-9) * 100.0
+        if current_price <= 0:
+            raise ValueError(f"Invalid current price for {coin_id}: {current_price}")
+        price_change_pct = (predicted_price_24h - current_price) / current_price * 100.0
 
         signal = ensemble_result["signal"]
         signal_label = "BUY" if signal == 1 else "SELL"

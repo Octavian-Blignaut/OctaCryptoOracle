@@ -186,7 +186,8 @@ def main() -> None:
                 c1, c2, c3 = st.columns(3)
                 c1.metric("Current Price", f"${pred['current_price']:,.2f}")
                 c2.metric("24h Prediction", f"${pred['predicted_price_24h']:,.2f}", f"{pred['price_change_pct']:.2f}%")
-                signal_color = "🟢" if pred["signal_label"] == "BUY" else "🔴" if pred["signal_label"] == "SELL" else "🟡"
+        signal_label_map = {"BUY": "🟢", "SELL": "🔴", "HOLD": "🟡"}
+        signal_color = signal_label_map.get(pred["signal_label"], "⚪")
                 c3.metric("Signal", f"{signal_color} {pred['signal_label']}")
 
                 st.metric("Confidence", f"{pred['confidence']*100:.1f}%")
