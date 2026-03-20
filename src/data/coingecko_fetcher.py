@@ -11,7 +11,7 @@ import requests
 from src.utils.config import get_config
 
 BASE_URL = "https://api.coingecko.com/api/v3"
-RATE_LIMIT_SLEEP = 1.2
+_DEFAULT_RATE_LIMIT_SLEEP = 1.2
 
 # Mock price ranges per coin
 MOCK_PRICE_RANGES = {
@@ -27,7 +27,7 @@ def _mock_ohlcv(coin_id: str, days: int) -> pd.DataFrame:
     lo, hi = MOCK_PRICE_RANGES.get(coin_id, (100, 200))
     n = days
     prices = rng.uniform(lo, hi, n)
-    timestamps = pd.date_range(end=pd.Timestamp.utcnow(), periods=n, freq="D")
+    timestamps = pd.date_range(end=pd.Timestamp.now("UTC"), periods=n, freq="D")
     opens = prices
     closes = prices * rng.uniform(0.97, 1.03, n)
     highs = np.maximum(opens, closes) * rng.uniform(1.0, 1.05, n)
@@ -41,15 +41,16 @@ def _mock_ohlcv(coin_id: str, days: int) -> pd.DataFrame:
 class CoinGeckoFetcher:
     """Fetches market data from CoinGecko API."""
 
-    def __init__(self) -> None:
+    def __init__(self, rate_limit_sleep: float = _DEFAULT_RATE_LIMIT_SLEEP) -> None:
         self._config = get_config()
+        self._rate_limit_sleep = rate_limit_sleep
         self._headers: dict = {}
         if self._config.COINGECKO_API_KEY:
             self._headers["x-cg-demo-api-key"] = self._config.COINGECKO_API_KEY
 
     def _get(self, endpoint: str, params: Optional[dict] = None) -> dict:
         url = f"{BASE_URL}{endpoint}"
-        time.sleep(RATE_LIMIT_SLEEP)
+        time.sleep(self._rate_limit_sleep)
         resp = requests.get(url, headers=self._headers, params=params, timeout=10)
         resp.raise_for_status()
         return resp.json()

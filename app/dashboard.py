@@ -1,5 +1,6 @@
 """Streamlit dashboard for OctaCryptoOracle."""
 
+import time
 import warnings
 
 import numpy as np
@@ -186,8 +187,8 @@ def main() -> None:
                 c1, c2, c3 = st.columns(3)
                 c1.metric("Current Price", f"${pred['current_price']:,.2f}")
                 c2.metric("24h Prediction", f"${pred['predicted_price_24h']:,.2f}", f"{pred['price_change_pct']:.2f}%")
-        signal_label_map = {"BUY": "🟢", "SELL": "🔴", "HOLD": "🟡"}
-        signal_color = signal_label_map.get(pred["signal_label"], "⚪")
+                signal_label_map = {"BUY": "🟢", "SELL": "🔴", "HOLD": "🟡"}
+                signal_color = signal_label_map.get(pred["signal_label"], "⚪")
                 c3.metric("Signal", f"{signal_color} {pred['signal_label']}")
 
                 st.metric("Confidence", f"{pred['confidence']*100:.1f}%")
@@ -235,7 +236,6 @@ def main() -> None:
             st.warning("Technical indicators unavailable (install pandas-ta and plotly).")
 
     if auto_refresh:
-        import time
         time.sleep(300)
         st.rerun()
 

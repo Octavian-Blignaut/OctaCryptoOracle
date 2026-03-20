@@ -12,6 +12,9 @@ except ImportError:
     _PLOTLY_AVAILABLE = False
 
 
+_TRADING_DAYS_PER_YEAR = 252  # approximate number of trading days in a year
+
+
 class Backtester:
     """Simulates a simple long-only trading strategy based on model signals."""
 
@@ -74,12 +77,12 @@ class Backtester:
 
         equity_arr = np.array(equity_curve)
         total_return = (equity_arr[-1] - self.initial_capital) / self.initial_capital * 100.0
-        n_years = max(n / 252, 1 / 252)
+        n_years = max(n / _TRADING_DAYS_PER_YEAR, 1 / _TRADING_DAYS_PER_YEAR)
         annualized = ((equity_arr[-1] / self.initial_capital) ** (1 / n_years) - 1) * 100.0
 
         # Sharpe ratio (daily returns)
         daily_returns = np.diff(equity_arr) / (equity_arr[:-1] + 1e-9)
-        sharpe = float(np.mean(daily_returns) / (np.std(daily_returns) + 1e-9) * np.sqrt(252))
+        sharpe = float(np.mean(daily_returns) / (np.std(daily_returns) + 1e-9) * np.sqrt(_TRADING_DAYS_PER_YEAR))
 
         # Max drawdown
         peak = np.maximum.accumulate(equity_arr)
