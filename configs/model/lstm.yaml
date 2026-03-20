@@ -1,0 +1,5 @@
+_target_: src.models.lstm_model.LSTMModel
+sequence_length: 60
+n_features: 1
+units: 128
+dropout: 0.2

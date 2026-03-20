@@ -1,0 +1,11 @@
+coingecko:
+  base_url: https://api.coingecko.com/api/v3
+  rate_limit_sleep: 1.2
+  
+ccxt:
+  exchange: binance
+  timeframe: 1d
+  
+solana:
+  helius_endpoint: https://api.helius.xyz/v0
+  birdeye_endpoint: https://public-api.birdeye.so
