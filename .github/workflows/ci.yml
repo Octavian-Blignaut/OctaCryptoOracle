@@ -17,5 +17,4 @@ jobs:
           python-version: '3.11'
       - name: Install dependencies
         run: |
-          pip install pandas-ta
-          pip install pandas numpy
+          pip install pandas-ta pandas numpy
