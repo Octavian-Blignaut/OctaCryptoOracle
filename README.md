@@ -113,7 +113,7 @@ pytest tests/ -v
 
 ## ⚠️ Disclaimer
 
-This platform is for **educational purposes only**. Cryptocurrency markets are highly volatile. Do not make financial decisions based solely on AI predictions. Always do your own research.
+This platform is for educational purposes only. Cryptocurrency markets are highly volatile, and you should not make financial decisions based solely on AI predictions. Always do your own research. Through active collaboration, we can refine these insights for the benefit of the entire community.
 
 ## License
 
