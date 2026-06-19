@@ -22,7 +22,7 @@ class SolanaFetcher:
             return float(resp.json()["solana"]["usd"])
         except Exception as exc:
             warnings.warn(f"SolanaFetcher.get_sol_price failed: {exc}. Using mock price.")
-            return float(np.random.default_rng(42).uniform(80, 200))
+            return float(np.random.default_rng(42).uniform(55, 85))
 
     def get_on_chain_metrics(self, address: str = None) -> dict:
         """Return on-chain metrics; falls back to mock data on failure."""
@@ -60,7 +60,7 @@ class SolanaFetcher:
 
         rng = np.random.default_rng(42)
         return {
-            "tps": float(rng.uniform(2000, 5000)),
+            "tps": float(rng.uniform(3000, 65000)),
             "active_validators": int(rng.integers(1500, 2000)),
             "stake_rate": float(rng.uniform(0.6, 0.8)),
             "tvl_defi": float(rng.uniform(5e8, 2e9)),

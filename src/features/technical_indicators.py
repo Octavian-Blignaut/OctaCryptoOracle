@@ -70,7 +70,13 @@ def add_all_indicators(df: pd.DataFrame) -> pd.DataFrame:
     # --- Volume ---
     df["OBV"] = ta.obv(df["close"], df["volume"])
     df["MFI_14"] = ta.mfi(df["high"], df["low"], df["close"], df["volume"], length=14)
-    df["VWAP"] = ta.vwap(df["high"], df["low"], df["close"], df["volume"])
+    # VWAP requires a DatetimeIndex; set timestamp as index temporarily
+    try:
+        df_ts = df.set_index("timestamp")
+        vwap_series = ta.vwap(df_ts["high"], df_ts["low"], df_ts["close"], df_ts["volume"])
+        df["VWAP"] = vwap_series.values
+    except Exception:
+        df["VWAP"] = np.nan
     df["volume_sma_20"] = ta.sma(df["volume"], length=20)
 
     # --- Custom ---
