@@ -10,6 +10,13 @@ from src.utils.config import get_config
 _config = get_config()
 
 
+def _warn_without_secret(message: str, secret: str | None) -> None:
+    """Log a warning without retaining an API credential in the message."""
+    if secret:
+        message = message.replace(secret, "[redacted]")
+    warnings.warn(message)
+
+
 class SolanaFetcher:
     """Fetches Solana price and on-chain metrics."""
 
@@ -29,8 +36,9 @@ class SolanaFetcher:
         config = get_config()
         if config.HELIUS_API_KEY:
             try:
-                url = f"https://api.helius.xyz/v0/network/stats?api-key={config.HELIUS_API_KEY}"
-                resp = requests.get(url, timeout=10)
+                url = "https://api.helius.xyz/v0/network/stats"
+                headers = {"X-Api-Key": config.HELIUS_API_KEY}
+                resp = requests.get(url, headers=headers, timeout=10)
                 resp.raise_for_status()
                 data = resp.json()
                 return {
@@ -40,7 +48,10 @@ class SolanaFetcher:
                     "tvl_defi": data.get("tvl_defi", 0.0),
                 }
             except Exception as exc:
-                warnings.warn(f"Helius API failed: {exc}. Trying Birdeye.")
+                _warn_without_secret(
+                    f"Helius API failed: {exc}. Trying Birdeye.",
+                    config.HELIUS_API_KEY,
+                )
 
         if config.BIRDEYE_API_KEY:
             try:
@@ -56,7 +67,10 @@ class SolanaFetcher:
                     "tvl_defi": data.get("tvl", 0.0),
                 }
             except Exception as exc:
-                warnings.warn(f"Birdeye API failed: {exc}. Using mock metrics.")
+                _warn_without_secret(
+                    f"Birdeye API failed: {exc}. Using mock metrics.",
+                    config.BIRDEYE_API_KEY,
+                )
 
         rng = np.random.default_rng(42)
         return {
@@ -71,15 +85,21 @@ class SolanaFetcher:
         config = get_config()
         if config.HELIUS_API_KEY:
             try:
-                url = (
-                    f"https://api.helius.xyz/v0/token-metadata"
-                    f"?api-key={config.HELIUS_API_KEY}"
+                url = "https://api.helius.xyz/v0/token-metadata"
+                headers = {"X-Api-Key": config.HELIUS_API_KEY}
+                resp = requests.get(
+                    url,
+                    headers=headers,
+                    params={"mintAccounts": token_address},
+                    timeout=10,
                 )
-                resp = requests.get(url, params={"mintAccounts": token_address}, timeout=10)
                 resp.raise_for_status()
                 data = resp.json()
                 if data and isinstance(data, list):
                     return int(data[0].get("numHolders", 0))
             except Exception as exc:
-                warnings.warn(f"get_token_holders failed: {exc}. Returning mock value.")
+                _warn_without_secret(
+                    f"get_token_holders failed: {exc}. Returning mock value.",
+                    config.HELIUS_API_KEY,
+                )
         return int(np.random.default_rng(42).integers(10000, 500000))
