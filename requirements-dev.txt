@@ -1,0 +1,5 @@
+# Optional data-versioning CLI. It is not part of the application install:
+# current DVC releases depend on diskcache, whose latest release still has
+# PYSEC-2026-2447 (pickle execution if an attacker can write the cache directory).
+-r requirements.txt
+dvc>=3.0.0

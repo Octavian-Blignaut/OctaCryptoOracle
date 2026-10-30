@@ -15,7 +15,7 @@ except ImportError:
 
 
 def _mock_ohlcv(symbol: str, limit: int) -> pd.DataFrame:
-    price_map = {"BTC/USDT": (40000, 70000), "SOL/USDT": (80, 200), "ETH/USDT": (2000, 4000)}
+    price_map = {"BTC/USDT": (55000, 75000), "SOL/USDT": (55, 85), "ETH/USDT": (1500, 2500)}
     lo, hi = price_map.get(symbol, (100, 1000))
     rng = np.random.default_rng(42)
     closes = rng.uniform(lo, hi, limit)
@@ -23,7 +23,7 @@ def _mock_ohlcv(symbol: str, limit: int) -> pd.DataFrame:
     highs = np.maximum(opens, closes) * rng.uniform(1.0, 1.05, limit)
     lows = np.minimum(opens, closes) * rng.uniform(0.95, 1.0, limit)
     volumes = rng.uniform(1e8, 1e10, limit)
-    timestamps = pd.date_range(end=pd.Timestamp.utcnow(), periods=limit, freq="D")
+    timestamps = pd.date_range(end=pd.Timestamp.now("UTC"), periods=limit, freq="D")
     return pd.DataFrame({"timestamp": timestamps, "open": opens, "high": highs, "low": lows, "close": closes, "volume": volumes})
 
 
@@ -59,7 +59,7 @@ class CCXTFetcher:
                 return self._exchange.fetch_ticker(symbol)
             except Exception as exc:
                 warnings.warn(f"CCXT get_ticker failed: {exc}. Returning mock ticker.")
-        price_map = {"BTC/USDT": 50000.0, "SOL/USDT": 130.0, "ETH/USDT": 3000.0}
+        price_map = {"BTC/USDT": 64000.0, "SOL/USDT": 70.0, "ETH/USDT": 1700.0}
         price = price_map.get(symbol, 100.0)
         rng = np.random.default_rng(42)
         return {

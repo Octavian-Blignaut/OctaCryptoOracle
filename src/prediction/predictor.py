@@ -98,8 +98,11 @@ class CryptoPredictorService:
         price_change_pct = (predicted_price_24h - current_price) / current_price * 100.0
 
         signal = ensemble_result["signal"]
-        signal_label = "BUY" if signal == 1 else "SELL"
         confidence = ensemble_result["ensemble_confidence"]
+        if confidence < 0.60:
+            signal_label = "HOLD"
+        else:
+            signal_label = "BUY" if signal == 1 else "SELL"
 
         # Backtest
         signals_list = [1 if ensemble_result["signal"] == 1 else 0] * len(df)

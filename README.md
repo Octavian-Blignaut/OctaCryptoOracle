@@ -36,25 +36,26 @@ pip install -r requirements.txt
 ```bash
 cp .env.example .env
 # Edit .env with your API keys (optional - mock data works without keys)
+# OCO_ALLOWED_ORIGINS=http://127.0.0.1:8501  # optional explicit browser origins
 ```
 
 ### 3. Run the Dashboard
 
 ```bash
-streamlit run app/dashboard.py
+streamlit run app/dashboard.py --server.address 127.0.0.1
 ```
 
 ### 4. Run the API
 
 ```bash
-uvicorn src.prediction.api:app --reload --port 8000
+uvicorn src.prediction.api:app --reload --host 127.0.0.1 --port 8000
 ```
 
 ### 5. Docker
 
 ```bash
 docker build -t octacryptooracle .
-docker run -p 8501:8501 octacryptooracle
+docker run -p 127.0.0.1:8501:8501 octacryptooracle
 ```
 
 ## API Endpoints

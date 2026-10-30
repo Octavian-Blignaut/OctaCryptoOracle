@@ -15,9 +15,9 @@ _DEFAULT_RATE_LIMIT_SLEEP = 1.2
 
 # Mock price ranges per coin
 MOCK_PRICE_RANGES = {
-    "bitcoin": (40000, 70000),
-    "solana": (80, 200),
-    "ethereum": (2000, 4000),
+    "bitcoin": (55000, 75000),
+    "solana": (55, 85),
+    "ethereum": (1500, 2500),
 }
 
 
