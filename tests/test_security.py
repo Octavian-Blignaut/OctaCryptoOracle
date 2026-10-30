@@ -146,6 +146,16 @@ def test_docker_build_excludes_env_file():
     assert ".env" in ignored.splitlines()
 
 
+def test_mlflow_requirement_excludes_known_vulnerable_releases():
+    requirement = next(
+        line.strip()
+        for line in (ROOT / "requirements.txt").read_text().splitlines()
+        if line.startswith("mlflow")
+    )
+
+    assert requirement == "mlflow>=3.17.2"
+
+
 def test_container_runs_as_non_root():
     dockerfile = (ROOT / "Dockerfile").read_text()
 
